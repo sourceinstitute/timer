@@ -11,6 +11,7 @@
       <div id="controls">
         <button v-shortkey.once="['1']" @shortkey="moreTime()" @click="moreTime">+1</button>
         <button v-shortkey="['f']" @shortkey="togglefs()" @click="togglefs">fs</button>
+        <button v-shortkey="['r']" @shortkey="restart()" @click="restart">r</button>
         <tooltip v-shortkey.once="['2']" @shortkey="moreTime(2)"></tooltip>
         <tooltip v-shortkey.once="['3']" @shortkey="moreTime(3)"></tooltip>
         <tooltip v-shortkey.once="['4']" @shortkey="moreTime(4)"></tooltip>
@@ -38,7 +39,7 @@ export default {
   },
   data() {
     return {
-      startTS: Date.now(),
+      startTS: Date.now() ,
       timerLength: 300,
       timeLeft: 300,
       timeElapsedSaved: 0,
@@ -50,7 +51,7 @@ export default {
   },
   computed: {
     endTS: function () {
-      return this.startTS + this.timerLength * 1000;
+      return this.startTS + this.timerLength * 1000 ;
     },
     style () {
       return "width: 50%";
@@ -116,6 +117,11 @@ export default {
     },
     fullscreenChange (fullscreen) {
       this.fullscreen = fullscreen
+    },
+    restart () {
+      this.startTS = Date.now() ;
+      this.timeLeft = this.timerLength;
+      this.running = true;
     }
   },
   filters: {
