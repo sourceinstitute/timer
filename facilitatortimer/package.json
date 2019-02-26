@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "vue": "^2.5.22",
+    "vue-fullscreen": "^2.1.5",
     "vue-headful": "^2.0.1"
   },
   "devDependencies": {

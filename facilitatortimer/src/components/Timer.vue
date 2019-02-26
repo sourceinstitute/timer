@@ -1,19 +1,21 @@
 <template>
   <div>
     <vue-headful :title="timeLeft | timer" />
-    <div id="prg">
-      <div class="bar" v-bind:style="{ width: percentage + '%' }"></div>
-    </div>
-    <div id="timer">
-      <span class="timeleft">{{timeLeft | timer }}</span>
-    </div>
-    <!-- <button @click="startTimer">Start Timer</button> -->
-    <div id="controls">
-      <button @click="moreTime">+1</button>
-    </div>
-    <div id="footer">
-    Made by <a href="http://source.institute">Source</a>
-    </div>
+    <fullscreen ref="fullscreen" @change="fullscreenChange">
+      <div id="prg">
+        <div class="bar" v-bind:style="{ width: percentage + '%' }"></div>
+      </div>
+      <div id="timer">
+        <span class="timeleft">{{timeLeft | timer }}</span>
+      </div>
+      <div id="controls">
+        <button @click="moreTime">+1</button>
+        <button @click="toggle">fs</button>
+      </div>
+      <div id="footer">
+      Made by <a href="http://source.institute">Source</a>
+      </div>
+    </fullscreen>
   </div>
 </template>
 
@@ -31,7 +33,8 @@ export default {
       timerLength: 300,
       timeLeft: 300,
       percentage: 100,
-      autostart: false
+      autostart: false,
+      fullscreen: false
     }
   },
   computed: {
@@ -79,6 +82,12 @@ export default {
         this.timerLength = Number(time);
       }
       return this.timerLength;
+    },
+    toggle () {
+      this.$fullscreen.toggle(document.body, {background: "#fff"});
+    },
+    fullscreenChange (fullscreen) {
+      this.fullscreen = fullscreen
     }
   },
   filters: {
