@@ -117,7 +117,8 @@ export default {
     },
     restart () {
       this.startTS = Date.now() ;
-      this.timeLeft = this.timerLength;
+      //this.timeLeft = this.timerLength;
+      this.requestedTime();
       this.running = true;
     }
   },
