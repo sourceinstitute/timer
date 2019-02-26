@@ -10,7 +10,7 @@
       </div>
       <div id="controls">
         <button @click="moreTime">+1</button>
-        <button @click="toggle">fs</button>
+        <button @click="togglefs">fs</button>
       </div>
       <div id="footer">
       Made by <a href="http://source.institute">Source</a>
@@ -34,6 +34,7 @@ export default {
       timeLeft: 300,
       percentage: 100,
       autostart: false,
+      running: false,
       fullscreen: false
     }
   },
@@ -48,20 +49,26 @@ export default {
   methods: {
     startTimer: function() {
       this.timer = setInterval(() => this.countdown(), 200);
+      this.running = true;
     },
     moreTime: function () {
       this.timerLength+=60;
     },
     countdown: function() {
+      if (this.running) {
       this.timeLeft = ((this.endTS - Date.now())/1000);
 
-      if (this.timeLeft < 0) {
-        this.percentage = 100;
-        this.timeLeft = "Done";
-        document.body.className = 'done'; 
-      } else {
-        var percentage = (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
-        this.percentage = percentage;
+        if (this.timeLeft < 0) {
+            this.percentage = 100;
+            this.timeLeft = "Done";
+            document.body.className = 'done'; 
+            var bell = new Audio("/sounds/bell.mp3");
+            bell.play();
+            this.running = false;
+        } else {
+          var percentage = (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
+          this.percentage = percentage;
+        }
       }
     },
     requestedTime: function() {
@@ -83,7 +90,7 @@ export default {
       }
       return this.timerLength;
     },
-    toggle () {
+    togglefs () {
       this.$fullscreen.toggle(document.body, {background: "#fff"});
     },
     fullscreenChange (fullscreen) {
