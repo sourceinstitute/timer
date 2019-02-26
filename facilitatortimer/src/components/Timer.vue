@@ -1,19 +1,15 @@
 <template>
   <div>
-    <div class="prg">
-      <progress-bar :options="{
-        text: { hideText: true, dynamicPosition: true },
-        progress: { color: '#2dbd2d', backgroundColor: '#000' },
-        layout: { height: 200, width: 200, type: 'line' }
-        }" 
-        :value = "percentage"
-/>
-      </div>
-      <div class="timer">
-        {{timeLeft | timer }}
-      </div>
+    <div id="prg">
+      <div class="bar" v-bind:style="{ width: percentage + '%' }"></div>
+    </div>
+    <div id="timer">
+      <span class="timeleft">{{timeLeft | timer }}</span>
+    </div>
     <!-- <button @click="startTimer">Start Timer</button> -->
-    <button @click="moreTime">+1</button>
+    <div id="controls">
+      <button @click="moreTime">+1</button>
+    </div>
   </div>
 </template>
 
@@ -38,10 +34,13 @@ export default {
     endTS: function () {
       return this.startTS + this.timerLength * 1000;
     },
+    style () {
+      return "width: 50%";
+    }
   },
   methods: {
     startTimer: function() {
-      this.timer = setInterval(() => this.countdown(), 1000);
+      this.timer = setInterval(() => this.countdown(), 200);
     },
     moreTime: function () {
       this.timerLength+=60;
@@ -50,11 +49,11 @@ export default {
       this.timeLeft = ((this.endTS - Date.now())/1000);
 
       if (this.timeLeft < 0) {
-        this.percentage = 0;
+        this.percentage = 100;
         this.timeLeft = "Done";
         document.body.className = 'done'; 
       } else {
-        var percentage = (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(0);
+        var percentage = (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
         this.percentage = percentage;
       }
     },
@@ -114,7 +113,10 @@ export default {
 </script>
 
 <style>
-.prg { float: right}
-.done { background: #09ef34; }
-.timer{font-size: 60vh; text-align: center;  height: 100%;}
+#controls { position: absolute; left: 20; top: 20; z-index: 20}
+#prg { position: absolute; width: 100%; height: 100%; z-index: 0;}
+#timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 30vw; text-align: center; vertical-align: middle;}
+#timer span {    position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%);}
+.bar { height: 100%; float: left; background: #47C27C;     -webkit-transition: 1s ; -moz-transition: 1s ; -o-transition: 1s ; transition: 1s ;}
+body.done { background: #47C27C; }
 </style>
