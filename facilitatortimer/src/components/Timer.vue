@@ -20,6 +20,7 @@
         <tooltip v-shortkey.once="['7']" @shortkey="moreTime(7)"></tooltip>
         <tooltip v-shortkey.once="['8']" @shortkey="moreTime(8)"></tooltip>
         <tooltip v-shortkey.once="['9']" @shortkey="moreTime(9)"></tooltip>
+        <tooltip v-shortkey.once="['0']" @shortkey="moreTime(10)"></tooltip>
         <tooltip v-shortkey.once="['space']" @shortkey="togglerunning()"></tooltip>
       </div>
       <div id="footer">
@@ -39,7 +40,7 @@ export default {
   },
   data() {
     return {
-      startTS: Date.now() ,
+      startTS: Date.now(),
       timerLength: 300,
       timeLeft: 300,
       timeElapsedSaved: 0,
@@ -51,10 +52,7 @@ export default {
   },
   computed: {
     endTS: function () {
-      return this.startTS + this.timerLength * 1000 ;
-    },
-    style () {
-      return "width: 50%";
+      return this.startTS + this.timerLength * 1000;
     }
   },
   methods: {
@@ -74,7 +72,6 @@ export default {
         if (this.timeLeft < 0) {
             this.percentage = 100;
             this.timeLeft = "Done";
-            document.body.className = 'done'; 
             var bell = new Audio("/sounds/bell.mp3");
             bell.play();
             this.running = false;
@@ -112,7 +109,7 @@ export default {
         this.timeElapsedSaved = this.timerLength - this.timeLeft;
       } else {
         this.running = true;
-        this.startTS = Date.now() - this.timeElapsedSaved*1000;
+        this.startTS = Date.now() - this.timeElapsedSaved*1000 ;
       }
     },
     fullscreenChange (fullscreen) {
@@ -127,6 +124,8 @@ export default {
   filters: {
     timer: function(value) {
       if (!isNaN(value)) {
+        // timeleft rounds down, so add a second to the way it's displayed
+        value += 1;
         var sec_num = parseInt(value, 10); // don't forget the second param
         var hours   = Math.floor(sec_num / 3600);
         var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
@@ -162,8 +161,8 @@ export default {
 <style>
 #controls { position: fixed; right: 10px; top: 10px; z-index: 20}
 #prg { position: absolute; width: 100%; height: 100%; z-index: 0;}
-#timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 25vw; text-align: center; vertical-align: middle;}
-#timer span {    position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%);}
+#timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 25vw; text-align: center; vertical-align: middle; mix-blend-mode: color-burn;}
+#timer span {position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%); font-color: #999;}
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20;}
 .bar { height: 100%; float: left; background: #47C27C;     -webkit-transition: 1s ; -moz-transition: 1s ; -o-transition: 1s ; transition: 1s ;}
 body.done { background: #47C27C; }
