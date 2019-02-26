@@ -9,8 +9,17 @@
         <span class="timeleft">{{timeLeft | timer }}</span>
       </div>
       <div id="controls">
-        <button @click="moreTime">+1</button>
-        <button @click="togglefs">fs</button>
+        <button v-shortkey.once="['1']" @shortkey="moreTime()" @click="moreTime">+1</button>
+        <button v-shortkey="['f']" @shortkey="togglefs()" @click="togglefs">fs</button>
+        <tooltip v-shortkey.once="['2']" @shortkey="moreTime(2)"></tooltip>
+        <tooltip v-shortkey.once="['3']" @shortkey="moreTime(3)"></tooltip>
+        <tooltip v-shortkey.once="['4']" @shortkey="moreTime(4)"></tooltip>
+        <tooltip v-shortkey.once="['5']" @shortkey="moreTime(5)"></tooltip>
+        <tooltip v-shortkey.once="['6']" @shortkey="moreTime(6)"></tooltip>
+        <tooltip v-shortkey.once="['7']" @shortkey="moreTime(7)"></tooltip>
+        <tooltip v-shortkey.once="['8']" @shortkey="moreTime(8)"></tooltip>
+        <tooltip v-shortkey.once="['9']" @shortkey="moreTime(9)"></tooltip>
+        <tooltip v-shortkey.once="['space']" @shortkey="togglerunning()"></tooltip>
       </div>
       <div id="footer">
       Made by <a href="http://source.institute">Source</a>
@@ -32,6 +41,7 @@ export default {
       startTS: Date.now(),
       timerLength: 300,
       timeLeft: 300,
+      timeElapsedSaved: 0,
       percentage: 100,
       autostart: false,
       running: false,
@@ -48,15 +58,17 @@ export default {
   },
   methods: {
     startTimer: function() {
-      this.timer = setInterval(() => this.countdown(), 200);
+      this.timer = setInterval(() => this.countdown(), 500);
       this.running = true;
     },
-    moreTime: function () {
-      this.timerLength+=60;
+    moreTime: function (number=1) {
+      if (this.running) {
+        this.timerLength+=(number*60);
+      }
     },
     countdown: function() {
       if (this.running) {
-      this.timeLeft = ((this.endTS - Date.now())/1000);
+        this.timeLeft = ((this.endTS - Date.now())/1000);
 
         if (this.timeLeft < 0) {
             this.percentage = 100;
@@ -92,6 +104,15 @@ export default {
     },
     togglefs () {
       this.$fullscreen.toggle(document.body, {background: "#fff"});
+    },
+    togglerunning () {
+      if (this.running) {
+        this.running = false;
+        this.timeElapsedSaved = this.timerLength - this.timeLeft;
+      } else {
+        this.running = true;
+        this.startTS = Date.now() - this.timeElapsedSaved*1000;
+      }
     },
     fullscreenChange (fullscreen) {
       this.fullscreen = fullscreen
