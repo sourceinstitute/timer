@@ -162,7 +162,7 @@ export default {
 <style>
 #controls { position: fixed; right: 10px; top: 10px; z-index: 20}
 #prg { position: absolute; width: 100%; height: 100%; z-index: 0;}
-#timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 25vw; text-align: center; vertical-align: middle; mix-blend-mode: color-burn;}
+#timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 25vw; text-align: center; vertical-align: middle; mix-blend-mode: multiply;}
 #timer span {position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%); font-color: #999;}
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20;}
 .bar { height: 100%; float: left; background: #47C27C;     -webkit-transition: 1s ; -moz-transition: 1s ; -o-transition: 1s ; transition: 1s ;}
