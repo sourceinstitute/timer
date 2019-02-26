@@ -1,5 +1,6 @@
 <template>
   <div>
+    <vue-headful :title="timeLeft | timer" />
     <div id="prg">
       <div class="bar" v-bind:style="{ width: percentage + '%' }"></div>
     </div>
