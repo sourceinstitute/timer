@@ -4,6 +4,8 @@ import vueHeadful from 'vue-headful'
 import fullscreen from 'vue-fullscreen'
 Vue.use(fullscreen, {name: 'fullscreen'})
 Vue.use(require('vue-shortkey'))
+import vmodal from 'vue-js-modal'
+Vue.use(vmodal)
 
 Vue.config.productionTip = false
 

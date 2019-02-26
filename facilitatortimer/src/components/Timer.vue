@@ -12,6 +12,7 @@
         <button v-shortkey.once="['1']" @shortkey="moreTime()" @click="moreTime">+1</button>
         <button v-shortkey="['f']" @shortkey="togglefs()" @click="togglefs">fs</button>
         <button v-shortkey="['r']" @shortkey="restart()" @click="restart">r</button>
+        <button v-shortkey="['h']" @shortkey="showhelp()" @click="showhelp">h</button>
         <tooltip v-shortkey.once="['2']" @shortkey="moreTime(2)"></tooltip>
         <tooltip v-shortkey.once="['3']" @shortkey="moreTime(3)"></tooltip>
         <tooltip v-shortkey.once="['4']" @shortkey="moreTime(4)"></tooltip>
@@ -24,8 +25,18 @@
         <tooltip v-shortkey.once="['space']" @shortkey="togglerunning()"></tooltip>
       </div>
       <div id="footer">
-      Made by <a href="http://source.institute">Source</a>
+        Made by <a href="http://source.institute">Source</a>
       </div>
+      <modal name="help">
+        <div id="help">
+          <h3>Help</h3>
+          <p>We made this timer for facilitators.</p>
+          <p><strong>R</strong> resets the timer. <br/>
+          <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes.<br/>
+          <strong>f</strong> toggles fullscreen.</p>
+          <p>You can set the time by adding the length of the timer to the address.  For example, <strong>sourcetimer.com/30</strong> for 30 seconds.  You can also use MM:SS or HH:MM:SS. For example, <strong>sourcetimer.com/1:40</strong> for 1 minute 40 seconds or <strong>sourcetimer.com/2:30:00</strong> for 2 and half hours.</p>
+        </div>
+      </modal>
     </fullscreen>
   </div>
 </template>
@@ -120,7 +131,11 @@ export default {
       //this.timeLeft = this.timerLength;
       this.requestedTime();
       this.running = true;
+    },
+    showhelp () {
+      this.$modal.toggle('help');
     }
+
   },
   filters: {
     timer: function(value) {
@@ -167,4 +182,5 @@ export default {
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20;}
 .bar { height: 100%; float: left; background: #47C27C;     -webkit-transition: 1s ; -moz-transition: 1s ; -o-transition: 1s ; transition: 1s ;}
 body.done { background: #47C27C; }
+#help { margin: 40px 30px;}
 </style>
