@@ -25,13 +25,12 @@
         <tooltip v-shortkey.once="['space']" @shortkey="togglerunning()"></tooltip>
       </div>
       <div id="footer">
-        Made by <a href="http://source.institute">Source</a>
+        Made for facilitators by <a href="http://source.institute">Source</a>
       </div>
-      <modal name="help">
+      <modal name="help" height="auto">
         <div id="help">
           <h3>Help</h3>
-          <p>We made this timer for facilitators.</p>
-          <p><strong>R</strong> resets the timer. <br/>
+          <p><strong>Space</strong> pauses. <strong>R</strong> resets the timer. <br/>
           <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes.<br/>
           <strong>f</strong> toggles fullscreen.</p>
           <p>You can set the time by adding the length of the timer to the address.  For example, <strong>sourcetimer.com/30</strong> for 30 seconds.  You can also use MM:SS or HH:MM:SS. For example, <strong>sourcetimer.com/1:40</strong> for 1 minute 40 seconds or <strong>sourcetimer.com/2:30:00</strong> for 2 and half hours.</p>
