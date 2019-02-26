@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Timer :time="300"></Timer>
+    <Timer></Timer>
   </div>
 </template>
 
@@ -11,12 +11,7 @@ export default {
   name: 'app',
   components: {
     Timer
-  },
-  data() {
-    return {
-      time: 300
-    }
-  },
+  }
 }
 </script>
 
