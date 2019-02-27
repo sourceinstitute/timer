@@ -6,6 +6,12 @@ Vue.use(fullscreen, {name: 'fullscreen'})
 Vue.use(require('vue-shortkey'))
 import vmodal from 'vue-js-modal'
 Vue.use(vmodal)
+import VueMatomo from 'vue-matomo'
+Vue.use(VueMatomo, {
+  host: 'http://piwik.source.institute',
+  siteId: 8,
+  enableLinkTracking: true
+  })
 
 Vue.config.productionTip = false
 

@@ -69,6 +69,7 @@ export default {
     startTimer: function() {
       this.timer = setInterval(() => this.countdown(), 500);
       this.running = true;
+      this.$matomo.trackEvent('timer', 'start');
     },
     moreTime: function (number=60) {
       if (this.running) {
@@ -117,9 +118,11 @@ export default {
       if (this.running) {
         this.running = false;
         this.timeElapsedSaved = this.timerLength - this.timeLeft;
+        this.$matomo.trackEvent('timer', 'pause');
       } else {
         this.running = true;
         this.startTS = Date.now() - this.timeElapsedSaved*1000 ;
+        this.$matomo.trackEvent('timer', 'unpause');
       }
     },
     fullscreenChange (fullscreen) {
