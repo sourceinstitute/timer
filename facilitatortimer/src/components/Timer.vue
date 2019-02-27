@@ -11,7 +11,6 @@
       <div id="controls">
         <button v-shortkey.once="['1']" @shortkey="moreTime()" @click="moreTime">1+</button>
         <button v-shortkey="['f']" @shortkey="togglefs()" @click="togglefs">f</button>
-        <button v-shortkey="['r']" @shortkey="restart()" @click="restart">r</button>
         <button v-shortkey="['h']" @shortkey="showhelp()" @click="showhelp">h</button>
         <tooltip v-shortkey.once="['2']" @shortkey="moreTime(2)"></tooltip>
         <tooltip v-shortkey.once="['3']" @shortkey="moreTime(3)"></tooltip>
@@ -23,6 +22,7 @@
         <tooltip v-shortkey.once="['9']" @shortkey="moreTime(9)"></tooltip>
         <tooltip v-shortkey.once="['0']" @shortkey="moreTime(10)"></tooltip>
         <tooltip v-shortkey.once="['space']" @shortkey="togglerunning()"></tooltip>
+        <tooltip v-shortkey.once="['r']" @shortkey="restart()" @click="restart">r</tooltip>
       </div>
       <div id="footer">
         Made for facilitators by <a href="http://source.institute">Source</a>
