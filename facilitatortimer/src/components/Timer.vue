@@ -30,9 +30,8 @@
       <modal name="help" height="auto">
         <div id="help">
           <h3>Help</h3>
-          <p><strong>Space</strong> pauses. <strong>R</strong> resets the timer. <br/>
-          <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes.<br/>
-          <strong>f</strong> toggles fullscreen.</p>
+          <p>Press <strong>space</strong> to pause/unpause. <strong>R</strong> restarts the time. <strong>F</strong> toggles fullscreen.</p>
+          While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes.<br/>
           <p>You can set the time by adding the length of the timer to the address.  For example, <strong>sourcetimer.com/30</strong> for 30 seconds.  You can also use MM:SS or HH:MM:SS. For example, <strong>sourcetimer.com/1:40</strong> for 1 minute 40 seconds or <strong>sourcetimer.com/2:30:00</strong> for 2 and half hours.</p>
         </div>
       </modal>
@@ -176,7 +175,7 @@ export default {
 <style>
 #controls { position: fixed; right: 10px; top: 10px; z-index: 20}
 #prg { position: absolute; width: 100%; height: 100%; z-index: 0;}
-#timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 25vw; text-align: center; vertical-align: middle; mix-blend-mode: multiply;}
+#timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 18vw; text-align: center; vertical-align: middle; mix-blend-mode: multiply; font-family: "PT Mono", monospace; }
 #timer span {position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%); font-color: #999;}
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20;}
 .bar { height: 100%; float: left; background: #47C27C;     -webkit-transition: 1s ; -moz-transition: 1s ; -o-transition: 1s ; transition: 1s ;}

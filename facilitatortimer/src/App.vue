@@ -17,8 +17,8 @@ export default {
 
 <style>
 #app {
-  @import url('https://fonts.googleapis.com/css?family=Oxygen:400');
-  font-family: "Oxygen", Helvetica, Arial, sans-serif;
+  @import url('https://fonts.googleapis.com/css?family=Oxygen|PT+Mono');
+  font-family: "Oxygen", Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
