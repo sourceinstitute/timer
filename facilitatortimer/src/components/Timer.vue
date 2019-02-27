@@ -22,7 +22,7 @@
         <tooltip v-shortkey.once="['9']" @shortkey="moreTime(9)"></tooltip>
         <tooltip v-shortkey.once="['0']" @shortkey="moreTime(10)"></tooltip>
         <tooltip v-shortkey.once="['space']" @shortkey="togglerunning()"></tooltip>
-        <tooltip v-shortkey.once="['r']" @shortkey="restart()" @click="restart">r</tooltip>
+        <tooltip v-shortkey.once="['r']" @shortkey="restart()" @click="restart"></tooltip>
       </div>
       <div id="footer">
         Made for facilitators by <a href="http://source.institute">Source</a>
