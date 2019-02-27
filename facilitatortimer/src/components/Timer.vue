@@ -58,6 +58,7 @@ export default {
       percentage: 100,
       autostart: false,
       running: false,
+      stopped: false,
       fullscreen: false,
       futureTimers: null
     }
@@ -91,6 +92,7 @@ export default {
               this.restart();
             } else {
               this.running = false;
+              this.stopped = true;
             }
         } else {
           var percentage = (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
@@ -142,7 +144,7 @@ export default {
         this.running = false;
         this.timeElapsedSaved = this.timerLength - this.timeLeft;
         this.$matomo.trackEvent('timer', 'pause');
-      } else {
+      } else if (!this.stopped) {
         this.running = true;
         this.startTS = Date.now() - this.timeElapsedSaved*1000 ;
         this.$matomo.trackEvent('timer', 'unpause');
