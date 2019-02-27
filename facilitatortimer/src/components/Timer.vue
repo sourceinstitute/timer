@@ -153,7 +153,6 @@ export default {
     },
     restart () {
       this.startTS = Date.now() ;
-      //this.timeLeft = this.timerLength;
       this.requestedTime();
       this.running = true;
     },
@@ -207,4 +206,7 @@ export default {
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20;}
 .bar { height: 100%; float: left; background: #47C27C;     -webkit-transition: 1s ; -moz-transition: 1s ; -o-transition: 1s ; transition: 1s ;}
 #help { margin: 40px 30px;}
+@media all and (max-height: 250px) {
+  #timer{font-size: 80vh; }
+}
 </style>
