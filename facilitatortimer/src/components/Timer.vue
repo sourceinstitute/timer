@@ -9,20 +9,21 @@
         <span class="timeleft">{{timeLeft | timer }}</span>
       </div>
       <div id="controls">
-        <button v-shortkey.once="['1']" @shortkey="moreTime()" @click="moreTime">1+</button>
+        <button v-shortkey.once="['1']" @shortkey="moreTime(60)" @click="moreTime(60)">1+</button>
         <button v-shortkey="['f']" @shortkey="togglefs()" @click="togglefs">f</button>
-        <button v-shortkey="['h']" @shortkey="showhelp()" @click="showhelp">h</button>
-        <tooltip v-shortkey.once="['2']" @shortkey="moreTime(2)"></tooltip>
-        <tooltip v-shortkey.once="['3']" @shortkey="moreTime(3)"></tooltip>
-        <tooltip v-shortkey.once="['4']" @shortkey="moreTime(4)"></tooltip>
-        <tooltip v-shortkey.once="['5']" @shortkey="moreTime(5)"></tooltip>
-        <tooltip v-shortkey.once="['6']" @shortkey="moreTime(6)"></tooltip>
-        <tooltip v-shortkey.once="['7']" @shortkey="moreTime(7)"></tooltip>
-        <tooltip v-shortkey.once="['8']" @shortkey="moreTime(8)"></tooltip>
-        <tooltip v-shortkey.once="['9']" @shortkey="moreTime(9)"></tooltip>
-        <tooltip v-shortkey.once="['0']" @shortkey="moreTime(10)"></tooltip>
+        <button v-shortkey="['h']" @shortkey="showhelp()" @click="showhelp">?</button>
+        <tooltip v-shortkey.once="['2']" @shortkey="moreTime(120)"></tooltip>
+        <tooltip v-shortkey.once="['3']" @shortkey="moreTime(180)"></tooltip>
+        <tooltip v-shortkey.once="['4']" @shortkey="moreTime(240)"></tooltip>
+        <tooltip v-shortkey.once="['5']" @shortkey="moreTime(300)"></tooltip>
+        <tooltip v-shortkey.once="['6']" @shortkey="moreTime(360)"></tooltip>
+        <tooltip v-shortkey.once="['7']" @shortkey="moreTime(420)"></tooltip>
+        <tooltip v-shortkey.once="['8']" @shortkey="moreTime(480)"></tooltip>
+        <tooltip v-shortkey.once="['9']" @shortkey="moreTime(520)"></tooltip>
+        <tooltip v-shortkey.once="['0']" @shortkey="moreTime(600)"></tooltip>
         <tooltip v-shortkey.once="['space']" @shortkey="togglerunning()"></tooltip>
         <tooltip v-shortkey.once="['r']" @shortkey="restart()" @click="restart"></tooltip>
+        <tooltip v-shortkey.once="['t']" @shortkey="moreTime(10)" @click="moreTime(10)"></tooltip>
       </div>
       <div id="footer">
         Made for facilitators by <a href="http://source.institute">Source</a>
@@ -31,8 +32,8 @@
         <div id="help">
           <h3>Help</h3>
           <p>Press <strong>space</strong> to pause/unpause. <strong>R</strong> restarts the time. <strong>F</strong> toggles fullscreen.</p>
-          While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes.<br/>
-          <p>You can set the time by adding the length of the timer to the address.  For example, <strong>sourcetimer.com/30</strong> for 30 seconds.  You can also use MM:SS or HH:MM:SS. For example, <strong>sourcetimer.com/1:40</strong> for 1 minute 40 seconds or <strong>sourcetimer.com/2:30:00</strong> for 2 and half hours.</p>
+          While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds. <br/>
+          <p>You can set the time by adding the length of the timer to the address.  For example, <strong>sourcetimer.com/30</strong> for 30 seconds.  You can also use MM:SS or HH:MM:SS. <strong>sourcetimer.com/1:40</strong> for 1 minute 40 seconds or <strong>sourcetimer.com/2:30:00</strong> for 2 and half hours.</p>
         </div>
       </modal>
     </fullscreen>
@@ -69,9 +70,9 @@ export default {
       this.timer = setInterval(() => this.countdown(), 500);
       this.running = true;
     },
-    moreTime: function (number=1) {
+    moreTime: function (number=60) {
       if (this.running) {
-        this.timerLength+=(number*60);
+        this.timerLength+=(number);
       }
     },
     countdown: function() {
