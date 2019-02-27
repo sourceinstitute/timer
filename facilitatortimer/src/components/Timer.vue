@@ -102,14 +102,15 @@ export default {
     },
     requestedTime: function() {
       var time = window.location.pathname.slice(1);
+
       if (this.futureTimers)  {
         time = this.futureTimers;
         this.futureTimers = null;
       }
 
-      if (time === '') {
+      if (time == '') {
         this.autostart = false;
-        this.timerLength=60;
+        this.timerLength=30;
       } 
       
       if (time.includes("/")) {
@@ -129,7 +130,7 @@ export default {
         this.timerLength = s;
       } 
       
-      if (!isNaN(time)) {
+      if (!isNaN(time) & time !== '') {
         this.autostart = true;
         this.timerLength = Number(time);
       }
