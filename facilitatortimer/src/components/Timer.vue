@@ -5,7 +5,7 @@
       <div id="prg">
         <div class="bar" v-bind:style="{ width: percentage + '%' }"></div>
       </div>
-      <div id="timer">
+      <div id="timer" v-on:click="togglerunning">
         <span class="timeleft">{{timeLeft | timer }}</span>
       </div>
       <div id="controls">
