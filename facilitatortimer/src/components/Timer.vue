@@ -34,6 +34,7 @@
           <p>Press <strong>space</strong> to pause/unpause. <strong>R</strong> restarts the time. <strong>F</strong> toggles fullscreen.</p>
           While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds. <br/>
           <p>You can set the time by adding the length of the timer to the address.  For example, <strong>sourcetimer.com/30</strong> for 30 seconds.  You can also use MM:SS or HH:MM:SS. <strong>sourcetimer.com/1:40</strong> for 1 minute 40 seconds or <strong>sourcetimer.com/2:30:00</strong> for 2 and half hours.</p>
+          <p>You can chain timers with <strong>/</strong> like <strong>sourcetimer.com/10/2:30/30</strong> to run a 10 second, 2 and half minute, then 30 second timer.</p>
         </div>
       </modal>
     </fullscreen>
@@ -57,7 +58,8 @@ export default {
       percentage: 100,
       autostart: false,
       running: false,
-      fullscreen: false
+      fullscreen: false,
+      futureTimers: null
     }
   },
   computed: {
@@ -85,7 +87,11 @@ export default {
             this.timeLeft = "Done";
             var bell = new Audio("/sounds/bell.mp3");
             bell.play();
-            this.running = false;
+            if (this.futureTimers) {
+              this.restart();
+            } else {
+              this.running = false;
+            }
         } else {
           var percentage = (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
           this.percentage = percentage;
@@ -94,10 +100,21 @@ export default {
     },
     requestedTime: function() {
       var time = window.location.pathname.slice(1);
+      if (this.futureTimers)  time = this.futureTimers;
+
       if (time === '') {
         this.autostart = false;
         this.timerLength=60;
-      } else if (time.includes(":")) {
+      } 
+      
+      if (time.includes("/")) {
+        var p = time.split('/');
+        time = p.shift();
+        this.futureTimers = p.join('/');
+        this.startTS = Date.now();
+      } 
+      
+      if (time.includes(":")) {
         this.autostart = true;
         var p = time.split(':'), s = 0, m = 1;
         while (p.length > 0) {
@@ -105,10 +122,13 @@ export default {
           m *= 60;
         }
         this.timerLength = s;
-      } else if (!isNaN(time)) {
+      } 
+      
+      if (!isNaN(time)) {
         this.autostart = true;
         this.timerLength = Number(time);
       }
+
       return this.timerLength;
     },
     togglefs () {
@@ -183,6 +203,5 @@ export default {
 #timer span {position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%); font-color: #999;}
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20;}
 .bar { height: 100%; float: left; background: #47C27C;     -webkit-transition: 1s ; -moz-transition: 1s ; -o-transition: 1s ; transition: 1s ;}
-body.done { background: #47C27C; }
 #help { margin: 40px 30px;}
 </style>
