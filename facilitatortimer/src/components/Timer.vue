@@ -26,7 +26,7 @@
         <tooltip v-shortkey.once="['t']" @shortkey="moreTime(10)" @click="moreTime(10)"></tooltip>
       </div>
       <div id="footer">
-        <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>. 
+        <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>
       </div>
       <modal name="help" height="auto">
         <div id="help">
