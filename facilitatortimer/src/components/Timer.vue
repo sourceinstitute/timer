@@ -32,7 +32,7 @@
       </div>
       <modal name="set" height="auto"  @before-close="restart">
         <form v-on:submit.prevent="setClosed">
-          <input v-shortkey.avoid id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" v-focus />
+          <input id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" @focus="$event.target.select()" v-focus v-shortkey.avoid />
         </form>
       </modal>
       <modal name="help" height="auto">
@@ -184,13 +184,11 @@ export default {
       this.$fullscreen.toggle(document.body, {background: "#fff"});
     },
     stopTicker() {
-      console.log('pause');
       this.running = false;
       this.timeElapsedSaved = this.timerLength - this.timeLeft;
       this.$matomo.trackEvent('timer', 'pause');
     },
     startTicker () {
-      console.log('start');
       this.running = true;
       this.startTS = Date.now() - this.timeElapsedSaved*1000 ;
       this.$matomo.trackEvent('timer', 'unpause');
