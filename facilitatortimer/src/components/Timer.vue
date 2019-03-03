@@ -32,7 +32,7 @@
       </div>
       <modal name="set" height="auto"  @before-close="restart">
         <form v-on:submit.prevent="setClosed">
-          <input v-shortkey.avoid id="time" placeholder="1:00" v-model="requestedTime" v-focus />
+          <input v-shortkey.avoid id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" v-focus />
         </form>
       </modal>
       <modal name="help" height="auto">
@@ -108,7 +108,6 @@ export default {
     updateTimeLeft: function(options = {}) {
       if (this.running || options['force'] == true) {
         this.timeLeft = ((this.endTS - Date.now())/1000);
-        if (isNaN(this.timeLeft)) this.timeLeft = 'Invalid';
 
         if (this.timeLeft < 0) {
             this.percentage = 100;
@@ -160,14 +159,16 @@ export default {
     convertClockToSeconds: function(clock) {
       if (!clock) return false; 
 
-      var p, s, m;
+      //Strip illegal chars
+      clock = clock.replace(/[^[0-9:]/gi, '');
 
+      var p, s, m;
 
       if (clock.includes(":")) {
         this.autostart = true;
         p = clock.split(':'), s = 0, m = 1;
         while (p.length > 0) {
-          s += m * parseInt(p.pop(), 10);
+          s += Number(m) * parseInt(Number(p.pop()), 10);
           m *= 60;
         }
       } else {
@@ -183,11 +184,13 @@ export default {
       this.$fullscreen.toggle(document.body, {background: "#fff"});
     },
     stopTicker() {
+      console.log('pause');
       this.running = false;
       this.timeElapsedSaved = this.timerLength - this.timeLeft;
       this.$matomo.trackEvent('timer', 'pause');
     },
     startTicker () {
+      console.log('start');
       this.running = true;
       this.startTS = Date.now() - this.timeElapsedSaved*1000 ;
       this.$matomo.trackEvent('timer', 'unpause');
@@ -195,7 +198,8 @@ export default {
     toggleTicker () {
       if (this.running) {
         this.stopTicker();
-      } else if (!this.stopped) {
+      //} else if (!this.stopped) {
+      } else {
         this.startTicker();
       }
     },
@@ -263,7 +267,7 @@ export default {
 .bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 1s linear ; -moz-transition: 1s linear; -o-transition: 1s linear ; transition: 1s linear;  }
 #help { margin: 40px 30px;}
 .logo {height: 4vh;}
-input { width: 100%; font-size: 15vh;}
+input { width: 100%; font-size: 2rem;}
 @media all and (max-height: 250px) {
   #timer{font-size: 80vh; }
 }
