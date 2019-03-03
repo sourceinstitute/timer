@@ -5,36 +5,43 @@
       <div id="prg">
         <div class="bar" v-bind:style="{ width: percentage + '%' }"></div>
       </div>
-      <div id="timer" v-on:click="togglerunning">
+      <div id="timer" v-on:click="toggleTicker">
         <span class="timeleft">{{timeLeft | timer }}</span>
       </div>
       <div id="controls">
         <button v-shortkey.once="['1']" @shortkey="moreTime(60)" @click="moreTime(60)">1+</button>
-        <button v-shortkey="['f']" @shortkey="togglefs()" @click="togglefs">f</button>
-        <button v-shortkey="['h']" @shortkey="showhelp()" @click="showhelp">?</button>
-        <tooltip v-shortkey.once="['2']" @shortkey="moreTime(120)"></tooltip>
-        <tooltip v-shortkey.once="['3']" @shortkey="moreTime(180)"></tooltip>
-        <tooltip v-shortkey.once="['4']" @shortkey="moreTime(240)"></tooltip>
-        <tooltip v-shortkey.once="['5']" @shortkey="moreTime(300)"></tooltip>
-        <tooltip v-shortkey.once="['6']" @shortkey="moreTime(360)"></tooltip>
-        <tooltip v-shortkey.once="['7']" @shortkey="moreTime(420)"></tooltip>
-        <tooltip v-shortkey.once="['8']" @shortkey="moreTime(480)"></tooltip>
-        <tooltip v-shortkey.once="['9']" @shortkey="moreTime(520)"></tooltip>
-        <tooltip v-shortkey.once="['0']" @shortkey="moreTime(600)"></tooltip>
-        <tooltip v-shortkey.once="['space']" @shortkey="togglerunning()"></tooltip>
-        <tooltip v-shortkey.once="['r']" @shortkey="restart()" @click="restart"></tooltip>
-        <tooltip v-shortkey.once="['t']" @shortkey="moreTime(10)" @click="moreTime(10)"></tooltip>
+        <button v-shortkey="['f']" @shortkey="toggleFS()" @click="toggleFS">f</button>
+        <button v-shortkey="['h']" @shortkey="showHelp()" @click="showHelp">?</button>
+        <i v-shortkey.once="['2']" @shortkey="moreTime(120)"></i>
+        <i v-shortkey.once="['3']" @shortkey="moreTime(180)"></i>
+        <i v-shortkey.once="['4']" @shortkey="moreTime(240)"></i>
+        <i v-shortkey.once="['5']" @shortkey="moreTime(300)"></i>
+        <i v-shortkey.once="['6']" @shortkey="moreTime(360)"></i>
+        <i v-shortkey.once="['7']" @shortkey="moreTime(420)"></i>
+        <i v-shortkey.once="['8']" @shortkey="moreTime(480)"></i>
+        <i v-shortkey.once="['9']" @shortkey="moreTime(520)"></i>
+        <i v-shortkey.once="['0']" @shortkey="moreTime(600)"></i>
+        <i v-shortkey.once="['space']" @shortkey="toggleTicker()"></i>
+        <i v-shortkey.once="['r']" @shortkey="restart()" @click="restart"></i>
+        <i v-shortkey.once="['s']" @shortkey="setTime()" @click="setTime"></i>
+        <i v-shortkey.once="['esc']" @shortkey="setTime()" @click="setTime"></i>
+        <i v-shortkey.once="['t']" @shortkey="moreTime(10)" @click="moreTime(10)"></i>
       </div>
       <div id="footer">
         <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>
       </div>
+      <modal name="set" height="auto"  @before-close="restart">
+        <form v-on:submit.prevent="setClosed">
+          <input v-shortkey.avoid id="time" placeholder="1:00" v-model="requestedTime" v-focus />
+        </form>
+      </modal>
       <modal name="help" height="auto">
         <div id="help">
           <h3>Help</h3>
           <p>This is a new project so <a href="mailto:salim@source.institute">feedback welcome!</a></p>
           <p>Press <strong>space</strong> to pause/unpause. <strong>R</strong> restarts the time. <strong>F</strong> toggles fullscreen.</p>
           While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds. <br/>
-          <p>You can set the time by adding the length of the timer to the address.  For example, <strong>sourcetimer.com/30</strong> for 30 seconds.  You can also use MM:SS or HH:MM:SS. <strong>sourcetimer.com/1:40</strong> for 1 minute 40 seconds or <strong>sourcetimer.com/2:30:00</strong> for 2 and half hours.</p>
+          <p>You can set the time by pressing <strong>S</strong>, or adding the length of the timer to the address.  For example, <strong>sourcetimer.com/30</strong> for 30 seconds.  You can also use MM:SS or HH:MM:SS. <strong>sourcetimer.com/1:40</strong> for 1 minute 40 seconds or <strong>sourcetimer.com/2:30:00</strong> for 2 and half hours.</p>
           <p>You can chain timers with <strong>/</strong> like <strong>sourcetimer.com/10/2:30/30</strong> to run a 10 second, 2 and half minute, then 30 second timer.</p>
         </div>
       </modal>
@@ -46,22 +53,40 @@
 export default {
   name: 'Timer',
   props: {
-    time: Number
   },
   components: {
   },
   data() {
     return {
       startTS: Date.now(),
-      timerLength: 300,
-      timeLeft: 300,
+      timerLength: 60,
+      timeLeft: 60,
       timeElapsedSaved: 0,
       percentage: 100,
       autostart: false,
       running: false,
       stopped: false,
       fullscreen: false,
-      futureTimers: null
+      futureTimers: window.location.pathname.slice(1),
+      requestedTime: window.location.pathname.slice(1),
+      currentRequest: null
+    }
+  },
+  watch: {
+    'requestedTime': function () {
+      this.futureTimers = this.requestedTime;
+      this.setupFutureTimers();
+      this.convertRequestToTimers();
+      this.startTS = Date.now() - 1;
+      this.updateTimeLeft({force: true}); 
+      this.stopTicker(); //Stop ticker to save elapsed time
+    }
+  },
+  directives: {
+    focus: {
+      inserted: function (el) {
+        el.focus()
+      }
     }
   },
   computed: {
@@ -70,8 +95,8 @@ export default {
     }
   },
   methods: {
-    startTimer: function() {
-      this.timer = setInterval(() => this.countdown(), 500);
+    setupTicker: function() {
+      this.timer = setInterval(() => this.updateTimeLeft(), 500);
       this.running = true;
       this.$matomo.trackEvent('timer', 'start');
     },
@@ -80,9 +105,10 @@ export default {
         this.timerLength+=(number);
       }
     },
-    countdown: function() {
-      if (this.running) {
+    updateTimeLeft: function(options = {}) {
+      if (this.running || options['force'] == true) {
         this.timeLeft = ((this.endTS - Date.now())/1000);
+        if (isNaN(this.timeLeft)) this.timeLeft = 'Invalid';
 
         if (this.timeLeft < 0) {
             this.percentage = 100;
@@ -90,66 +116,87 @@ export default {
             var bell = new Audio("/sounds/bell.mp3");
             bell.play();
             if (this.futureTimers) {
+              this.queueNextTimers();
               this.restart();
             } else {
               this.running = false;
               this.stopped = true;
             }
         } else {
-          var percentage = (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
-          this.percentage = percentage;
+          this.updatePercentage();
         }
       }
     },
-    requestedTime: function() {
-      var time = window.location.pathname.slice(1);
+    updatePercentage: function() {
+      this.percentage = (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
+    },
+    setTime: function() {
+      this.stopTicker();
+      this.$modal.show('set');
+    },
+    setClosed: function() {
+      this.restart();
+      this.$modal.hide('set');
+    },
+    setupFutureTimers: function () {
+      var p;
+      var time = this.futureTimers;
 
-      if (this.futureTimers)  {
-        time = this.futureTimers;
-        this.futureTimers = null;
+      if (time) {
+        if (time.includes("/")) {
+          p = time.split('/');
+          time = p.shift();
+          this.futureTimers = p.join('/');
+        } else {
+          this.futureTimers = null;
+        }
+        this.currentRequest = time;
       }
+      this.startTS = Date.now();
+    },
+    queueNextTimers: function () {
+      this.setupFutureTimers();
+    },
+    convertClockToSeconds: function(clock) {
+      if (!clock) return false; 
 
-      if (time == '') {
-        this.autostart = false;
-        this.timerLength=30;
-      } 
-      
-      if (time.includes("/")) {
-        var p = time.split('/');
-        time = p.shift();
-        this.futureTimers = p.join('/');
-        this.startTS = Date.now();
-      } 
-      
-      if (time.includes(":")) {
+      var p, s, m;
+
+
+      if (clock.includes(":")) {
         this.autostart = true;
-        var p = time.split(':'), s = 0, m = 1;
+        p = clock.split(':'), s = 0, m = 1;
         while (p.length > 0) {
           s += m * parseInt(p.pop(), 10);
           m *= 60;
         }
-        this.timerLength = s;
-      } 
-      
-      if (!isNaN(time) & time !== '') {
-        this.autostart = true;
-        this.timerLength = Number(time);
+      } else {
+        s = Number(clock);
       }
 
-      return this.timerLength;
+      return s;
     },
-    togglefs () {
+    convertRequestToTimers: function() {
+      this.timerLength = this.convertClockToSeconds(this.currentRequest);
+    },
+    toggleFS () {
       this.$fullscreen.toggle(document.body, {background: "#fff"});
     },
-    togglerunning () {
+    stopTicker() {
+      this.running = false;
+      this.timeElapsedSaved = this.timerLength - this.timeLeft;
+      this.$matomo.trackEvent('timer', 'pause');
+    },
+    startTicker () {
+      this.running = true;
+      this.startTS = Date.now() - this.timeElapsedSaved*1000 ;
+      this.$matomo.trackEvent('timer', 'unpause');
+    },
+    toggleTicker () {
       if (this.running) {
-        this.running = false;
-        this.timeElapsedSaved = this.timerLength - this.timeLeft;
-        this.$matomo.trackEvent('timer', 'pause');
+        this.stopTicker();
       } else if (!this.stopped) {
-        this.running = true;
-        this.startTS = Date.now() - this.timeElapsedSaved*1000 ;
-        this.$matomo.trackEvent('timer', 'unpause');
+        this.startTicker();
       }
     },
     fullscreenChange (fullscreen) {
@@ -157,10 +204,10 @@ export default {
     },
     restart () {
       this.startTS = Date.now() ;
-      this.requestedTime();
+      this.convertRequestToTimers();
       this.running = true;
     },
-    showhelp () {
+    showHelp () {
       this.$modal.toggle('help');
     }
 
@@ -190,11 +237,15 @@ export default {
     }
   },
   beforeMount() {
-    this.startTimer();
-    this.requestedTime();
-    this.countdown();
+    this.setupTicker();
+    this.setupFutureTimers();
+    this.convertRequestToTimers();
+    this.updateTimeLeft();
   },
   mounted() {
+    if(this.requestedTime == "") {
+      this.$modal.show('set');
+    }
   },
   beforeDestroy() {
     clearInterval(this.timer)
@@ -209,9 +260,10 @@ export default {
 #timer span {position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%); font-color: #999;}
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20; mix-blend-mode: multiply; }
 #footer .logo {mix-blend-mode: overlay; }
-.bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 1s ; -moz-transition: 1s ; -o-transition: 1s ; transition: 1s;  }
+.bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 1s linear ; -moz-transition: 1s linear; -o-transition: 1s linear ; transition: 1s linear;  }
 #help { margin: 40px 30px;}
 .logo {height: 4vh;}
+input { width: 100%; font-size: 15vh;}
 @media all and (max-height: 250px) {
   #timer{font-size: 80vh; }
 }

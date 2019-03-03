@@ -3,7 +3,7 @@ import App from './App.vue'
 import vueHeadful from 'vue-headful'
 import fullscreen from 'vue-fullscreen'
 Vue.use(fullscreen, {name: 'fullscreen'})
-Vue.use(require('vue-shortkey'))
+Vue.use(require('vue-shortkey'),  { prevent: ['input', 'textarea'] })
 import vmodal from 'vue-js-modal'
 Vue.use(vmodal)
 import VueMatomo from 'vue-matomo'
