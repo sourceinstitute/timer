@@ -33,7 +33,7 @@
       <modal name="set" height="auto"  @before-close="restart" :pivotY="0.3">
         <form v-on:submit.prevent="setClosed">
           <input id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" @focus="$event.target.select()" v-focus v-shortkey.avoid />
-          Then press <strong>enter</strong>. You can reset the timer any time by pressing <strong>Esc</strong> or <strong>S</strong>.
+          Then press <strong>enter</strong>. You can set the timer any time by pressing <strong>Esc</strong> or <strong>S</strong>.
         </form>
       </modal>
       <modal name="help" height="auto">
