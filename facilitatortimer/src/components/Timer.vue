@@ -30,7 +30,7 @@
       <div id="footer">
         <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>
       </div>
-      <modal name="set" height="auto"  @before-close="restart">
+      <modal name="set" height="auto"  @before-close="restart" :pivotY="0.3">
         <form v-on:submit.prevent="setClosed">
           <input id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" @focus="$event.target.select()" v-focus v-shortkey.avoid />
         </form>
