@@ -33,16 +33,18 @@
       <modal name="set" height="auto"  @before-close="restart" :pivotY="0.3">
         <form v-on:submit.prevent="setClosed">
           <input id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" @focus="$event.target.select()" v-focus v-shortkey.avoid />
+          Then press <strong>enter</strong>. You can reset the timer any time by pressing <strong>Esc</strong> or <strong>S</strong>.
         </form>
       </modal>
       <modal name="help" height="auto">
         <div id="help">
           <h3>Help</h3>
           <p>This is a new project so <a href="mailto:salim@source.institute">feedback welcome!</a></p>
+          <p>Set the time by pressing <strong>S</strong> or <strong>Esc</strong>.</p>
+          <p>You can chain timers with <strong>/</strong> like <strong>10/2:30/30</strong> to run a 10 second, 2 and half minute, then 30 second timer.</p>
           <p>Press <strong>space</strong> to pause/unpause. <strong>R</strong> restarts the time. <strong>F</strong> toggles fullscreen.</p>
-          While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds. <br/>
-          <p>You can set the time by pressing <strong>S</strong>, or adding the length of the timer to the address.  For example, <strong>sourcetimer.com/30</strong> for 30 seconds.  You can also use MM:SS or HH:MM:SS. <strong>sourcetimer.com/1:40</strong> for 1 minute 40 seconds or <strong>sourcetimer.com/2:30:00</strong> for 2 and half hours.</p>
-          <p>You can chain timers with <strong>/</strong> like <strong>sourcetimer.com/10/2:30/30</strong> to run a 10 second, 2 and half minute, then 30 second timer.</p>
+          <p>While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds. <br/>
+          <p>Autostart by adding the timer to the address.  For example, <strong><a href="http://sourcetimer.com/3:00">sourcetimer.com/3:00</a></strong> for 3 minutes.</p>    
         </div>
       </modal>
     </fullscreen>
@@ -272,7 +274,8 @@ export default {
 .bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 1s linear ; -moz-transition: 1s linear; -o-transition: 1s linear ; transition: 1s linear;  }
 #help { margin: 40px 30px;}
 .logo {height: 4vh;}
-input { width: 100%; font-size: 2rem;}
+input { width: 94%; font-size: 2rem;}
+form {margin: .5rem; text-align: center;}
 @media all and (max-height: 250px) {
   #timer{font-size: 80vh; }
 }
