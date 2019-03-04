@@ -111,7 +111,7 @@ export default {
 
         if (this.timeLeft < 0) {
             this.percentage = 100;
-            this.timeLeft = "Done";
+            this.timeLeft = "0:00";
             var bell = new Audio("/sounds/bell.mp3");
             bell.play();
             if (this.futureTimers) {
