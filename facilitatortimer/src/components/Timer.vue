@@ -8,10 +8,12 @@
       <div id="timer" v-on:click="pressSpace">
         <span class="timeleft">{{timeLeft | timer }}</span>
       </div>
+      <a id="fullscreen" v-shortkey="['f']" @shortkey="toggleFS()" @click="toggleFS"><img src="/images/fullscreen.png" /></a>
       <div id="controls">
-        <button v-shortkey.once="['1']" @shortkey="moreTime(60)" @click="moreTime(60)">1+</button>
-        <button v-shortkey="['f']" @shortkey="toggleFS()" @click="toggleFS">f</button>
-        <button v-shortkey="['h']" @shortkey="showHelp()" @click="showHelp">?</button>
+        <a v-shortkey.once="['h']" @shortkey="showHelp()" @click="showHelp"><img src="/images/help.png" /></a>
+        <a v-shortkey.once="['s']" @shortkey="setTime()" @click="setTime"><img src="/images/alarm.png" /></a>
+        <i v-shortkey.once="['space']" @shortkey="toggleTicker()"></i>
+        <i v-shortkey.once="['1']" @shortkey="moreTime(60)"></i>
         <i v-shortkey.once="['2']" @shortkey="moreTime(120)"></i>
         <i v-shortkey.once="['3']" @shortkey="moreTime(180)"></i>
         <i v-shortkey.once="['4']" @shortkey="moreTime(240)"></i>
@@ -21,7 +23,6 @@
         <i v-shortkey.once="['8']" @shortkey="moreTime(480)"></i>
         <i v-shortkey.once="['9']" @shortkey="moreTime(520)"></i>
         <i v-shortkey.once="['0']" @shortkey="moreTime(600)"></i>
-        <i v-shortkey.once="['space']" @shortkey="pressSpace()"></i>
         <i v-shortkey.once="['r']" @shortkey="restart()" @click="restart"></i>
         <i v-shortkey.once="['s']" @shortkey="setTime()" @click="setTime"></i>
         <i v-shortkey.once="['esc']" @shortkey="setTime()" @click="setTime"></i>
@@ -30,13 +31,13 @@
       <div id="footer">
         <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>
       </div>
-      <modal name="set" height="auto"  @before-close="restart" :pivotY="0.3" :adaptive="true">
+      <modal name="set" height="auto" @before-close="" :pivotY="0.2" :adaptive="true">
         <form v-on:submit.prevent="setClosed">
-          <input id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" @focus="$event.target.select()" v-focus v-shortkey.avoid />
+          <input id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" @focus="$event.target.select()" v-focus v-shortkey.avoid autocomplete="off" />
           <p>Then press <strong>enter</strong>. You can set the timer any time by pressing <strong>Esc</strong> or <strong>S</strong>.</p>
         </form>
       </modal>
-      <modal name="help" height="auto" :adaptive="true" :scrollable="true">
+      <modal name="help" height="auto" width="80%" :adaptive="true" :scrollable="true">
         <div id="help">
           <h3>Help</h3>
           <p>This is a new project so <a href="mailto:salim@source.institute">feedback welcome!</a></p>
@@ -122,6 +123,7 @@ export default {
             } else {
               this.running = false;
               this.stopped = true;
+              this.setTime();
             }
         } else {
           this.updatePercentage();
@@ -265,6 +267,7 @@ export default {
 </script>
 
 <style>
+#fullscreen { position: fixed; right: 10px; bottom: 10px; z-index: 20}
 #controls { position: fixed; right: 10px; top: 10px; z-index: 20}
 #prg { position: absolute; width: 100%; height: 100%; z-index: 0;}
 #timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 18vw; text-align: center; vertical-align: middle; mix-blend-mode: multiply; font-family: "PT Mono", monospace; }
@@ -276,7 +279,11 @@ export default {
 .logo {height: 4vh;}
 input { width: 94%; font-size: 2rem;}
 form {margin: .5rem; text-align: center;}
+#controls img, #fullscreen img { width: 1rem; min-width: 50px; min-height: 50px; height: 1rem; padding: 4px; }
 @media all and (max-height: 250px) {
   #timer{font-size: 80vh; }
+}
+@media all and (max-height: 500px) {
+  #fullscreen img, #controls img { width: 2rem; min-width: 30px; min-height: 30px; height: 2rem; padding: 4px; }
 }
 </style>
