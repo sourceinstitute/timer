@@ -120,7 +120,7 @@ export default {
       if (this.running || options['force'] == true) {
         this.timeLeft = ((this.endTS - Date.now())/1000);
 
-        if (this.timeLeft < Math.min(this.timerLength/10, 60)) {
+        if (this.timeLeft < Math.min(this.timerLength/5, 60)) {
           this.isFinal = true;
         } else {
           this.isFinal = false;
