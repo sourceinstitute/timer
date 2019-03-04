@@ -3,7 +3,7 @@
     <vue-headful :title="timeLeft | timer" />
     <fullscreen ref="fullscreen" @change="fullscreenChange">
       <div id="prg">
-        <div class="bar" v-bind:style="{ width: percentage + '%' }"></div>
+        <div id="bar" v-bind:style="{ width: percentage + '%' }" :class="{ final: isFinal}"></div>
       </div>
       <div id="timer" v-on:click="pressSpace">
         <span class="timeleft">{{timeLeft | timer }}</span>
@@ -23,10 +23,12 @@
         <i v-shortkey.once="['8']" @shortkey="moreTime(480)"></i>
         <i v-shortkey.once="['9']" @shortkey="moreTime(520)"></i>
         <i v-shortkey.once="['0']" @shortkey="moreTime(600)"></i>
-        <i v-shortkey.once="['r']" @shortkey="restart()" @click="restart"></i>
-        <i v-shortkey.once="['s']" @shortkey="setTime()" @click="setTime"></i>
-        <i v-shortkey.once="['esc']" @shortkey="setTime()" @click="setTime"></i>
-        <i v-shortkey.once="['t']" @shortkey="moreTime(10)" @click="moreTime(10)"></i>
+        <i v-shortkey.once="['r']" @shortkey="restart()"></i>
+        <i v-shortkey.once="['s']" @shortkey="setTime()"></i>
+        <i v-shortkey.once="['esc']" @shortkey="setTime()"></i>
+        <i v-shortkey.once="['t']" @shortkey="moreTime(10)"></i>
+        <i v-shortkey.once="['arrowleft']" @shortkey="scootchTimer(60)"></i>
+        <i v-shortkey.once="['arrowright']" @shortkey="scootchTimer(-60)"></i>
       </div>
       <div id="footer">
         <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>
@@ -72,7 +74,8 @@ export default {
       fullscreen: false,
       futureTimers: window.location.pathname.slice(1),
       requestedTime: window.location.pathname.slice(1),
-      currentRequest: null
+      currentRequest: null,
+      isFinal: false
     }
   },
   watch: {
@@ -109,12 +112,23 @@ export default {
         this.$matomo.trackEvent('timer', 'moretime');
       }
     },
+    scootchTimer: function (number=60) {
+      this.startTS+=(number*1000);
+      this.$matomo.trackEvent('timer', 'scootch');
+    },
     updateTimeLeft: function(options = {}) {
       if (this.running || options['force'] == true) {
         this.timeLeft = ((this.endTS - Date.now())/1000);
 
+        if (this.timeLeft < Math.min(this.timerLength/10, 60)) {
+          this.isFinal = true;
+        } else {
+          this.isFinal = false;
+        }
+
         if (this.timeLeft < 0) {
             this.percentage = 100;
+            this.isFinal = false;
             this.timeLeft = "0:00";
             var bell = new Audio("/sounds/bell.mp3");
             bell.play();
@@ -210,7 +224,6 @@ export default {
     toggleTicker () {
       if (this.running) {
         this.stopTicker();
-      //} else if (!this.stopped) {
       } else {
         this.startTicker();
       }
@@ -279,7 +292,8 @@ export default {
 #timer span {position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%); font-color: #999;}
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20; mix-blend-mode: multiply; }
 #footer .logo {mix-blend-mode: overlay; }
-.bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 1s linear ; -moz-transition: 1s linear; -o-transition: 1s linear ; transition: 1s linear;  }
+#bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 1s linear ; -moz-transition: 1s linear; -o-transition: 1s linear ; transition: 1s linear;  }
+#bar.final {    animation-duration: 500ms; animation-name: blink; animation-iteration-count: infinite; animation-direction: alternate;}
 #help { margin: 40px 30px;}
 .logo {height: 4vh;}
 input { width: 94%; font-size: 2rem;}
@@ -291,4 +305,6 @@ form {margin: .5rem; text-align: center;}
 @media all and (max-height: 500px) {
   #fullscreen img, #controls img { width: 2rem; min-width: 30px; min-height: 30px; height: 2rem; padding: 4px; }
 }
+@keyframes blink { from { opacity: 1; } to { opacity: 0.3; } }
 </style>
+
