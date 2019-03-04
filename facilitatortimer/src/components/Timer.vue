@@ -5,7 +5,7 @@
       <div id="prg">
         <div class="bar" v-bind:style="{ width: percentage + '%' }"></div>
       </div>
-      <div id="timer" v-on:click="toggleTicker">
+      <div id="timer" v-on:click="pressSpace">
         <span class="timeleft">{{timeLeft | timer }}</span>
       </div>
       <div id="controls">
@@ -21,7 +21,7 @@
         <i v-shortkey.once="['8']" @shortkey="moreTime(480)"></i>
         <i v-shortkey.once="['9']" @shortkey="moreTime(520)"></i>
         <i v-shortkey.once="['0']" @shortkey="moreTime(600)"></i>
-        <i v-shortkey.once="['space']" @shortkey="toggleTicker()"></i>
+        <i v-shortkey.once="['space']" @shortkey="pressSpace()"></i>
         <i v-shortkey.once="['r']" @shortkey="restart()" @click="restart"></i>
         <i v-shortkey.once="['s']" @shortkey="setTime()" @click="setTime"></i>
         <i v-shortkey.once="['esc']" @shortkey="setTime()" @click="setTime"></i>
@@ -192,6 +192,13 @@ export default {
       this.running = true;
       this.startTS = Date.now() - this.timeElapsedSaved*1000 ;
       this.$matomo.trackEvent('timer', 'unpause');
+    },
+    pressSpace() {
+      if (this.timeLeft == '0:00') {
+        this.setTime();
+      } else {
+        this.toggleTicker();
+      }
     },
     toggleTicker () {
       if (this.running) {
