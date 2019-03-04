@@ -30,13 +30,13 @@
       <div id="footer">
         <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>
       </div>
-      <modal name="set" height="auto"  @before-close="restart" :pivotY="0.3">
+      <modal name="set" height="auto"  @before-close="restart" :pivotY="0.3" :adaptive="true">
         <form v-on:submit.prevent="setClosed">
           <input id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" @focus="$event.target.select()" v-focus v-shortkey.avoid />
-          Then press <strong>enter</strong>. You can set the timer any time by pressing <strong>Esc</strong> or <strong>S</strong>.
+          <p>Then press <strong>enter</strong>. You can set the timer any time by pressing <strong>Esc</strong> or <strong>S</strong>.</p>
         </form>
       </modal>
-      <modal name="help" height="auto">
+      <modal name="help" height="auto" :adaptive="true" :scrollable="true">
         <div id="help">
           <h3>Help</h3>
           <p>This is a new project so <a href="mailto:salim@source.institute">feedback welcome!</a></p>
