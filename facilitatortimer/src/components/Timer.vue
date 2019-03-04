@@ -106,6 +106,7 @@ export default {
     moreTime: function (number=60) {
       if (this.running) {
         this.timerLength+=(number);
+        this.$matomo.trackEvent('timer', 'moretime');
       }
     },
     updateTimeLeft: function(options = {}) {
@@ -136,6 +137,7 @@ export default {
     setTime: function() {
       this.stopTicker();
       this.$modal.show('set');
+      this.$matomo.trackEvent('timer', 'set');
     },
     setClosed: function() {
       this.restart();
@@ -185,6 +187,7 @@ export default {
       this.timerLength = this.convertClockToSeconds(this.currentRequest);
     },
     toggleFS () {
+      this.$matomo.trackEvent('timer', 'fs');
       this.$fullscreen.toggle(document.body, {background: "#fff"});
     },
     stopTicker() {
@@ -219,9 +222,11 @@ export default {
       this.startTS = Date.now() ;
       this.convertRequestToTimers();
       this.running = true;
+      this.$matomo.trackEvent('timer', 'restart');
     },
     showHelp () {
       this.$modal.toggle('help');
+      this.$matomo.trackEvent('timer', 'help');
     }
 
   },
