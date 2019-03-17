@@ -8,7 +8,7 @@
         <div id="totalbar" v-bind:style="{ width: percentage + '%' }"></div>
       </div>
       <div id="timer" v-on:click="pressSpace">
-        <span class="timeleft">{{currentTimeLeft | timer }}</span>
+        <span class="timeleft" v-resize-text="{ratio:1}" v-bind:class="{label: currentLabel}" >{{currentTimeLeft | timer(currentLabel)}}</span>
       </div>
       <a id="fullscreen" v-shortkey="['f']" @shortkey="toggleFS()" @click="toggleFS"><img src="/images/fullscreen.png" /></a>
       <div id="controls">
@@ -44,10 +44,10 @@
           <h3>Help</h3>
           <p>This is a new project so <a href="mailto:salim@source.institute">feedback welcome!</a></p>
           <p>Set the time by pressing <strong>S</strong> or <strong>Esc</strong>.</p>
-          <p>You can chain timers with <strong>/</strong> like <strong>10/2:30/30</strong> to run a 10 second, 2 and half minute, then 30 second timer.</p>
           <p>Press <strong>space</strong> to pause/unpause. <strong>R</strong> restarts the time. <strong>F</strong> toggles fullscreen.</p>
           <p>While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds.<br/>
           <p>Autostart by adding the timer to the address.  For example, <strong><a href="http://sourcetimer.com/3:00">sourcetimer.com/3:00</a></strong> for 3 minutes.</p>    
+          <p>You can chain timers with <strong>/</strong> like <strong>10/2:30/30</strong> to run a 10 second, 2 and half minute, then 30 second timer. And you can add instructions with <strong>()</strong> like <strong>10(Get ready)/2:30(Work)/30(Clean up)</strong>. This is great for setting up links from your presentations.</p>
         </div>
       </modal>
     </fullscreen>
@@ -68,6 +68,7 @@ export default {
       timeLeft: 60,
       timeElapsed: 0,
       currentTimeLeft: 60,
+      currentLabel: "",
       timeElapsedSaved: 0,
       autostart: false,
       running: false,
@@ -75,9 +76,10 @@ export default {
       fullscreen: false,
       bellPoints: new Array(),
       internalTimers: new Array(),
+      internalTimerLabels: new Array(),
       internalTimerMarker: 0,
       nextBell: new Array(),
-      requestedTime: window.location.pathname.slice(1),
+      requestedTime: decodeURI(window.location.pathname.slice(1)),
       currentRequest: null,
       isFinal: false
     }
@@ -88,6 +90,12 @@ export default {
       this.startTS = Date.now() - 1;
       this.updateTimeLeft({force: true}); 
       this.stopTicker(); //Stop ticker to save elapsed time
+    },
+    'internalTimerLabels': function () {
+      this.updateCurrentLabel();
+    },
+    'internalTimerMarker': function () {
+      this.updateCurrentLabel();
     }
   },
   directives: {
@@ -152,6 +160,14 @@ export default {
     nextInternalTimer: function() {
       this.nextBell.shift();
       this.internalTimerMarker++;
+      this.updateTimeLeft();
+    },
+    updateCurrentLabel: function() {
+      var ret = this.internalTimerLabels[this.internalTimerMarker];
+      if (typeof ret === 'undefined') {
+        this.currentLabel = "";
+      } 
+      this.currentLabel = ret;
     },
     updateTimeLeft: function(options = {}) {
       if (this.running || options['force'] == true) {
@@ -170,7 +186,6 @@ export default {
             var bell = new Audio("/sounds/bell.mp3");
             bell.play();
             this.nextInternalTimer();
-
         }
         if (this.timeLeft < 0) {
             this.isFinal = false;
@@ -204,6 +219,7 @@ export default {
         var p = time.split('/');
         if (time.includes("/")) {
           for (var i = 0; i < p.length; i++) {
+            this.internalTimerLabels[i] = this.convertClockToLabel(p[i]);
             this.internalTimers[i] = this.convertClockToSeconds(p[i]);
             totaltime += this.internalTimers[i];
             this.bellPoints[i] = totaltime ;
@@ -223,9 +239,21 @@ export default {
     queueNextTimers: function () {
       this.setupFutureTimers();
     },
+    convertClockToLabel: function(clock) {
+      if (!clock) return false; 
+
+      if(clock = clock.match(/\(([^)]+)\)/)) {
+        return clock[1];
+      } else {
+        return "";
+      }
+
+    },
     convertClockToSeconds: function(clock) {
       if (!clock) return false; 
 
+      //Strip labels
+      clock = clock.replace(/\(([^)]+)\)/gi, '');
       //Strip illegal chars
       clock = clock.replace(/[^[0-9:]/gi, '');
 
@@ -291,8 +319,10 @@ export default {
 
   },
   filters: {
-    timer: function(value) {
-      if (!isNaN(value)) {
+    timer: function(value, label) {
+      if (label) {
+        return label;
+      } else if (!isNaN(value)) {
         // timeleft rounds down, so add a second to the way it's displayed
         value += 1;
         var sec_num = parseInt(value, 10); // don't forget the second param
@@ -317,6 +347,7 @@ export default {
   beforeMount() {
     this.setupTicker();
     this.setupBellPoints();
+    this.updateCurrentLabel();
     this.updateTimeLeft();
   },
   mounted() {
@@ -337,6 +368,7 @@ export default {
 #prg { position: absolute; width: 100%; height: 100%; z-index: 0;}
 #timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 18vw; text-align: center; vertical-align: middle; mix-blend-mode: multiply; font-family: "PT Mono", monospace; }
 #timer span {position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%); font-color: #999;}
+#timer span.label { font-family: "Oxygen"; }
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20; mix-blend-mode: multiply; }
 #footer .logo {mix-blend-mode: overlay; }
 #bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 0.5s linear ; -moz-transition: 0.5s linear; -o-transition: 0.5s linear ; transition: 0.5s linear;  }

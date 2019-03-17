@@ -12,6 +12,8 @@ Vue.use(VueMatomo, {
   siteId: 8,
   enableLinkTracking: true
   })
+import VueResizeText from 'vue-resize-text';
+Vue.use(VueResizeText)
 
 Vue.config.productionTip = false
 
