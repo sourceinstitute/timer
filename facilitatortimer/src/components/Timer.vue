@@ -2,11 +2,13 @@
   <div>
     <vue-headful :title="timeLeft | timer" />
     <fullscreen ref="fullscreen" @change="fullscreenChange">
+      <div v-for="line in bellPoints" class="bellline" v-bind:style="{ width: (line)/timerLength*100 + '%'}"> </div>
       <div id="prg">
-        <div id="bar" v-bind:style="{ width: percentage + '%' }" :class="{ final: isFinal}"></div>
+        <div id="bar" v-bind:style="{ width: currentPercentage + '%' }" :class="{ final: isFinal}"></div>
+        <div id="totalbar" v-bind:style="{ width: percentage + '%' }"></div>
       </div>
       <div id="timer" v-on:click="pressSpace">
-        <span class="timeleft">{{timeLeft | timer }}</span>
+        <span class="timeleft">{{currentTimeLeft | timer }}</span>
       </div>
       <a id="fullscreen" v-shortkey="['f']" @shortkey="toggleFS()" @click="toggleFS"><img src="/images/fullscreen.png" /></a>
       <div id="controls">
@@ -27,8 +29,6 @@
         <i v-shortkey.once="['s']" @shortkey="setTime()"></i>
         <i v-shortkey.once="['esc']" @shortkey="setTime()"></i>
         <i v-shortkey.once="['t']" @shortkey="moreTime(10)"></i>
-        <i v-shortkey.once="['arrowleft']" @shortkey="scootchTimer(60)"></i>
-        <i v-shortkey.once="['arrowright']" @shortkey="scootchTimer(-60)"></i>
       </div>
       <div id="footer">
         <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>
@@ -46,7 +46,7 @@
           <p>Set the time by pressing <strong>S</strong> or <strong>Esc</strong>.</p>
           <p>You can chain timers with <strong>/</strong> like <strong>10/2:30/30</strong> to run a 10 second, 2 and half minute, then 30 second timer.</p>
           <p>Press <strong>space</strong> to pause/unpause. <strong>R</strong> restarts the time. <strong>F</strong> toggles fullscreen.</p>
-          <p>While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds. Scootch the timer forward and back by a minute with <strong>left</strong> and <strong>right</strong>.<br/>
+          <p>While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds.<br/>
           <p>Autostart by adding the timer to the address.  For example, <strong><a href="http://sourcetimer.com/3:00">sourcetimer.com/3:00</a></strong> for 3 minutes.</p>    
         </div>
       </modal>
@@ -66,13 +66,17 @@ export default {
       startTS: Date.now(),
       timerLength: 60,
       timeLeft: 60,
+      timeElapsed: 0,
+      currentTimeLeft: 60,
       timeElapsedSaved: 0,
-      percentage: 100,
       autostart: false,
       running: false,
       stopped: false,
       fullscreen: false,
-      futureTimers: window.location.pathname.slice(1),
+      bellPoints: new Array(),
+      internalTimers: new Array(),
+      internalTimerMarker: 0,
+      nextBell: new Array(),
       requestedTime: window.location.pathname.slice(1),
       currentRequest: null,
       isFinal: false
@@ -80,9 +84,7 @@ export default {
   },
   watch: {
     'requestedTime': function () {
-      this.futureTimers = this.requestedTime;
-      this.setupFutureTimers();
-      this.convertRequestToTimers();
+      this.setupBellPoints();
       this.startTS = Date.now() - 1;
       this.updateTimeLeft({force: true}); 
       this.stopTicker(); //Stop ticker to save elapsed time
@@ -98,6 +100,32 @@ export default {
   computed: {
     endTS: function () {
       return this.startTS + this.timerLength * 1000;
+    },
+    currentTimerLength: function () {
+      var ret = this.timerLength;
+      if (typeof this.internalTimers[this.internalTimerMarker] !== 'undefined') {
+        ret = this.internalTimers[this.internalTimerMarker];
+      } 
+      return ret;
+    },
+    percentage: function () {
+      return (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
+    },
+    currentPercentage: function () {
+      return (Number(this.timerLength-this.timeLeft-this.prevTimers)/ this.currentTimerLength*100).toFixed(2);
+    },
+    prevTimers: function () {
+      var prevTimers = 0;
+      if (typeof this.bellPoints[this.internalTimerMarker-1] !== 'undefined') {
+        prevTimers = this.bellPoints[this.internalTimerMarker-1];
+      }
+      return prevTimers;
+    },
+    upcomingBell: function () {
+      if (typeof this.nextBell[0] !== 'undefined') {
+        return this.nextBell[0];
+      }
+      return this.timerLength;
     }
   },
   methods: {
@@ -109,27 +137,43 @@ export default {
     moreTime: function (number=60) {
       if (this.running) {
         this.timerLength+=(number);
+        this.internalTimers[this.internalTimerMarker] += number;
+        for (var i = 0; i < this.bellPoints.length; i++) {
+          if (this.internalTimers[i] > this.timeElapsed) {
+            this.bellPoints[i] += number;
+          }
+        }
+        for (var i = 0; i < this.nextBell.length; i++) {
+          this.nextBell[i] += number;
+        }
         this.$matomo.trackEvent('timer', 'moretime');
       }
     },
-    scootchTimer: function (number=60) {
-      this.startTS+=(number*1000);
-      this.$matomo.trackEvent('timer', 'scootch');
+    nextInternalTimer: function() {
+      this.nextBell.shift();
+      this.internalTimerMarker++;
     },
     updateTimeLeft: function(options = {}) {
       if (this.running || options['force'] == true) {
         this.timeLeft = ((this.endTS - Date.now())/1000);
-
+        this.timeElapsed = this.timerLength-this.timeLeft;
+        var bellsRemaining = this.internalTimers.reduce((pv, cv) => pv+cv, 0); //sum remaining bells
+        this.currentTimeLeft = Math.max(0, this.prevTimers - this.timeElapsed + this.currentTimerLength);
+    
         if (this.timeLeft < Math.min(this.timerLength/5, 60)) {
           this.isFinal = true;
         } else {
           this.isFinal = false;
         }
 
+        if ((this.timerLength - this.timeLeft) > this.upcomingBell) {
+            var bell = new Audio("/sounds/bell.mp3");
+            bell.play();
+            this.nextInternalTimer();
+
+        }
         if (this.timeLeft < 0) {
-            this.percentage = 100;
             this.isFinal = false;
-            this.timeLeft = "0:00";
             var bell = new Audio("/sounds/bell.mp3");
             bell.play();
             if (this.futureTimers) {
@@ -140,13 +184,8 @@ export default {
               this.stopped = true;
               this.setTime();
             }
-        } else {
-          this.updatePercentage();
-        }
+        } 
       }
-    },
-    updatePercentage: function() {
-      this.percentage = (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
     },
     setTime: function() {
       this.stopTicker();
@@ -157,21 +196,29 @@ export default {
       this.restart();
       this.$modal.hide('set');
     },
-    setupFutureTimers: function () {
-      var p;
-      var time = this.futureTimers;
+    setupBellPoints: function () {
+      var time = this.requestedTime;
+      var totaltime = 0;
 
       if (time) {
+        var p = time.split('/');
         if (time.includes("/")) {
-          p = time.split('/');
-          time = p.shift();
-          this.futureTimers = p.join('/');
+          for (var i = 0; i < p.length; i++) {
+            this.internalTimers[i] = this.convertClockToSeconds(p[i]);
+            totaltime += this.internalTimers[i];
+            this.bellPoints[i] = totaltime ;
+          }
+
+          this.internalTimerMarker = 0;
+          this.bellPoints.pop(); //last bell is the final
+          this.nextBell = this.bellPoints.slice();
         } else {
-          this.futureTimers = null;
+          totaltime = time;
         }
-        this.currentRequest = time;
+          
+        this.timerLength = totaltime;
+        this.timeLeft = totaltime;
       }
-      this.startTS = Date.now();
     },
     queueNextTimers: function () {
       this.setupFutureTimers();
@@ -233,7 +280,7 @@ export default {
     },
     restart () {
       this.startTS = Date.now() ;
-      this.convertRequestToTimers();
+      this.setupBellPoints();
       this.running = true;
       this.$matomo.trackEvent('timer', 'restart');
     },
@@ -269,8 +316,7 @@ export default {
   },
   beforeMount() {
     this.setupTicker();
-    this.setupFutureTimers();
-    this.convertRequestToTimers();
+    this.setupBellPoints();
     this.updateTimeLeft();
   },
   mounted() {
@@ -286,13 +332,15 @@ export default {
 
 <style>
 #fullscreen { position: fixed; right: 10px; bottom: 10px; z-index: 20}
-#controls { position: fixed; right: 10px; top: 10px; z-index: 20}
+#controls { position: fixed; right: 10px; top: 6%; z-index: 20}
+.bellline { position: absolute; top: 0; height: 4%; float: left; border-right: 0.5rem solid #999; z-index: 20;}
 #prg { position: absolute; width: 100%; height: 100%; z-index: 0;}
 #timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 18vw; text-align: center; vertical-align: middle; mix-blend-mode: multiply; font-family: "PT Mono", monospace; }
 #timer span {position: fixed; left: 0; top: 50%; width: 100%; transform: translateY(-50%); font-color: #999;}
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20; mix-blend-mode: multiply; }
 #footer .logo {mix-blend-mode: overlay; }
-#bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 1s linear ; -moz-transition: 1s linear; -o-transition: 1s linear ; transition: 1s linear;  }
+#bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 0.5s linear ; -moz-transition: 0.5s linear; -o-transition: 0.5s linear ; transition: 0.5s linear;  }
+#totalbar { position: absolute; height: 4%; float: left; background: #2c3e50;  -webkit-transition: 0.5s linear ; -moz-transition: 0.5s linear; -o-transition: 0.5s linear ; transition: 0.5s linear;  }
 #bar.final {    animation-duration: 500ms; animation-name: blink; animation-iteration-count: infinite; animation-direction: alternate;}
 #help { margin: 40px 30px;}
 .logo {height: 4vh;}
