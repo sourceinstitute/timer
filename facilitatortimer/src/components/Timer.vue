@@ -364,6 +364,7 @@ export default {
 <style>
 #fullscreen { position: fixed; right: 10px; bottom: 10px; z-index: 20}
 #controls { position: fixed; right: 10px; top: 6%; z-index: 20}
+#controls img { filter: greyscale(50%) hue-rotate(90deg); }
 .bellline { position: absolute; top: 0; height: 4%; float: left; border-right: 0.5rem solid #999; z-index: 20;}
 #prg { position: absolute; width: 100%; height: 100%; z-index: 0;}
 #timer{position: absolute; width: 100%; height: 100%; z-index: 10; font-size: 18vw; text-align: center; vertical-align: middle; mix-blend-mode: multiply; font-family: "PT Mono", monospace; }
@@ -372,7 +373,7 @@ export default {
 #footer {position: absolute; bottom: 10px; left: 10px; right: 10px; height: 4vh; font-size: 3vh; text-align: center; z-index: 20; mix-blend-mode: multiply; }
 #footer .logo {mix-blend-mode: overlay; }
 #bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 0.5s linear ; -moz-transition: 0.5s linear; -o-transition: 0.5s linear ; transition: 0.5s linear;  }
-#totalbar { position: absolute; height: 4%; float: left; background: #2c3e50;  -webkit-transition: 0.5s linear ; -moz-transition: 0.5s linear; -o-transition: 0.5s linear ; transition: 0.5s linear;  }
+#totalbar { position: absolute; height: 4%; float: left; background: #000;  -webkit-transition: 0.5s linear ; -moz-transition: 0.5s linear; -o-transition: 0.5s linear ; transition: 0.5s linear;  }
 #bar.final {    animation-duration: 500ms; animation-name: blink; animation-iteration-count: infinite; animation-direction: alternate;}
 #help { margin: 40px 30px;}
 .logo {height: 4vh;}
