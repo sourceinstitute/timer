@@ -2,7 +2,7 @@
   <div>
     <vue-headful :title="timeLeft | timer" />
     <fullscreen ref="fullscreen" @change="fullscreenChange">
-      <div v-for="line in bellPoints" class="bellline" v-bind:style="{ width: (line)/timerLength*100 + '%'}"> </div>
+      <div v-for="line in bellPoints" class="bellline" v-bind:style="{ width: line/timerLength*100 + '%'}"> </div>
       <div id="prg">
         <div id="bar" v-bind:style="{ width: currentPercentage + '%' }" :class="{ final: isFinal}"></div>
         <div id="totalbar" v-bind:style="{ width: percentage + '%' }"></div>
@@ -70,7 +70,6 @@ export default {
       currentTimeLeft: 60,
       currentLabel: "",
       timeElapsedSaved: 0,
-      autostart: false,
       running: false,
       stopped: false,
       fullscreen: false,
@@ -130,10 +129,11 @@ export default {
       return prevTimers;
     },
     upcomingBell: function () {
+      var ret = this.timerLength;
       if (typeof this.nextBell[0] !== 'undefined') {
-        return this.nextBell[0];
+        ret = this.nextBell[0];
       }
-      return this.timerLength;
+      return  ret;
     }
   },
   methods: {
@@ -160,7 +160,6 @@ export default {
     nextInternalTimer: function() {
       this.nextBell.shift();
       this.internalTimerMarker++;
-      this.updateTimeLeft();
     },
     updateCurrentLabel: function() {
       var ret = this.internalTimerLabels[this.internalTimerMarker];
@@ -173,8 +172,8 @@ export default {
       if (this.running || options['force'] == true) {
         this.timeLeft = ((this.endTS - Date.now())/1000);
         this.timeElapsed = this.timerLength-this.timeLeft;
-        var bellsRemaining = this.internalTimers.reduce((pv, cv) => pv+cv, 0); //sum remaining bells
-        this.currentTimeLeft = Math.max(0, this.prevTimers - this.timeElapsed + this.currentTimerLength);
+        //var bellsRemaining = this.internalTimers.reduce((pv, cv) => pv+cv, 0); //sum remaining bells
+        this.currentTimeLeft = this.currentTimerLength-this.timeElapsed+this.prevTimers;
     
         if (this.timeLeft < Math.min(this.timerLength/5, 60)) {
           this.isFinal = true;
@@ -191,14 +190,9 @@ export default {
             this.isFinal = false;
             var bell = new Audio("/sounds/bell.mp3");
             bell.play();
-            if (this.futureTimers) {
-              this.queueNextTimers();
-              this.restart();
-            } else {
-              this.running = false;
-              this.stopped = true;
-              this.setTime();
-            }
+            this.running = false;
+            this.stopped = true;
+            this.setTime();
         } 
       }
     },
@@ -215,6 +209,13 @@ export default {
       var time = this.requestedTime;
       var totaltime = 0;
 
+      //clear
+      this.internalTimers = new Array ();
+      this.internalTimerLabels = new Array ();
+      this.bellPoints = new Array ();
+      this.nextBell = new Array ();
+      this.internalTimerMarker = 0;
+
       if (time) {
         var p = time.split('/');
         if (time.includes("/")) {
@@ -225,19 +226,17 @@ export default {
             this.bellPoints[i] = totaltime ;
           }
 
-          this.internalTimerMarker = 0;
           this.bellPoints.pop(); //last bell is the final
           this.nextBell = this.bellPoints.slice();
         } else {
-          totaltime = time;
+          this.internalTimerLabels[0] = this.convertClockToLabel(time);
+          totaltime = this.internalTimers[0] = this.convertClockToSeconds(time);
         }
           
         this.timerLength = totaltime;
         this.timeLeft = totaltime;
+        this.startTicker();
       }
-    },
-    queueNextTimers: function () {
-      this.setupFutureTimers();
     },
     convertClockToLabel: function(clock) {
       if (!clock) return false; 
@@ -260,7 +259,6 @@ export default {
       var p, s, m;
 
       if (clock.includes(":")) {
-        this.autostart = true;
         p = clock.split(':'), s = 0, m = 1;
         while (p.length > 0) {
           s += Number(m) * parseInt(Number(p.pop()), 10);
@@ -271,9 +269,6 @@ export default {
       }
 
       return s;
-    },
-    convertRequestToTimers: function() {
-      this.timerLength = this.convertClockToSeconds(this.currentRequest);
     },
     toggleFS () {
       this.$matomo.trackEvent('timer', 'fs');
