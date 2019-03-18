@@ -4,7 +4,7 @@
     <fullscreen ref="fullscreen" @change="fullscreenChange">
       <div v-for="line in bellPoints" class="bellline" v-bind:style="{ width: line/timerLength*100 + '%'}"> </div>
       <div id="prg">
-        <div id="bar" v-bind:style="{ width: currentPercentage + '%' }" :class="{ final: isFinal}"></div>
+        <div id="bar" v-bind:style="{ width: currentPercentage + '%' }" :class="{ final: isFinal, mm: isMMmode}"></div>
         <div id="totalbar" v-bind:style="{ width: percentage + '%' }"></div>
       </div>
       <div id="timer" v-on:click="pressSpace">
@@ -29,6 +29,7 @@
         <i v-shortkey.once="['s']" @shortkey="setTime()"></i>
         <i v-shortkey.once="['esc']" @shortkey="setTime()"></i>
         <i v-shortkey.once="['t']" @shortkey="moreTime(10)"></i>
+        <i v-shortkey.once="['m']" @shortkey="setMode('mm')"></i>
       </div>
       <div id="footer">
         <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>
@@ -36,7 +37,7 @@
       <modal name="set" height="auto" @before-close="" :pivotY="0.2" :adaptive="true">
         <form v-on:submit.prevent="setClosed">
           <input id="time" placeholder="Type seconds or HH:MM:SS" v-model="requestedTime" @focus="$event.target.select()" v-focus v-shortkey.avoid autocomplete="off" />
-          <p>Then press <strong>enter</strong>. Reset any time by pressing <strong>Esc</strong>. <button v-on:click="showHelp">Advanced Options</button> </p>
+          <p>Then press <strong>enter</strong>. Reset any time by pressing <strong>Esc</strong>. <a href="#" onclick="return false;" v-on:click="showHelp">Advanced Options</a> </p>
         </form>
       </modal>
       <modal name="help" height="auto" width="80%" :adaptive="true" :scrollable="true">
@@ -44,8 +45,8 @@
           <h3>Help</h3>
           <p>This is a new project so <a href="mailto:salim@source.institute">feedback welcome!</a></p>
           <p>Set the time by pressing <strong>S</strong> or <strong>Esc</strong>.</p>
-          <p>Press <strong>space</strong> to pause/unpause. <strong>R</strong> restarts the time. <strong>F</strong> toggles fullscreen.</p>
-          <p>While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds.<br/>
+          <p>Press <strong>space</strong> to pause/unpause. <strong>R</strong> restarts the time. <strong>F</strong> toggles fullscreen. <strong>M</strong> toggles Matthew McConaughey.</p>
+          <p>While the timer's running, <strong>1-9</strong> adds bonus time (in minutes). <strong>0</strong> adds 10 minutes. <strong>T</strong> adds 10 seconds. <br/>
           <p>Autostart by adding the timer to the address.  For example, <strong><a href="http://sourcetimer.com/3:00">sourcetimer.com/3:00</a></strong> for 3 minutes.</p>    
           <p>You can chain timers with <strong>/</strong> like <strong>10/2:30/30</strong> to run a 10 second, 2 and half minute, then 30 second timer. And you can add instructions with <strong>()</strong> like <strong>10(Get ready)/2:30(Work)/30(Clean up)</strong>. This is great for setting up links from your presentations.</p>
         </div>
@@ -80,14 +81,15 @@ export default {
       nextBell: new Array(),
       requestedTime: decodeURI(window.location.pathname.slice(1)),
       currentRequest: null,
-      isFinal: false
+      isFinal: false,
+      isMMmode: false,
     }
   },
   watch: {
     'requestedTime': function () {
       this.setupBellPoints();
       this.startTS = Date.now() - 1;
-      this.updateTimeLeft({force: true}); 
+      //this.updateTimeLeft({force: true}); 
       this.stopTicker(); //Stop ticker to save elapsed time
     },
     'internalTimerLabels': function () {
@@ -182,18 +184,31 @@ export default {
         }
 
         if ((this.timerLength - this.timeLeft) > this.upcomingBell) {
-            var bell = new Audio("/sounds/bell.mp3");
+            if (this.isMMmode ) {
+              var bell = new Audio("/sounds/alright.mp3");
+            } else {
+              var bell = new Audio("/sounds/bell.mp3");
+            }
             bell.play();
             this.nextInternalTimer();
         }
         if (this.timeLeft < 0) {
             this.isFinal = false;
-            var bell = new Audio("/sounds/bell.mp3");
+            if (this.isMMmode ) {
+              var bell = new Audio("/sounds/alright.mp3");
+            } else {
+              var bell = new Audio("/sounds/bell.mp3");
+            }
             bell.play();
             this.running = false;
             this.stopped = true;
             this.setTime();
         } 
+      }
+    },
+    setMode: function(mode) {
+      if (mode == "mm") {
+        this.isMMmode = !this.isMMmode;
       }
     },
     setTime: function() {
@@ -370,6 +385,7 @@ export default {
 #bar { height: 100%; float: left; background: #18c953;  -webkit-transition: 0.5s linear ; -moz-transition: 0.5s linear; -o-transition: 0.5s linear ; transition: 0.5s linear;  }
 #totalbar { position: absolute; height: 4%; float: left; background: #000;  -webkit-transition: 0.5s linear ; -moz-transition: 0.5s linear; -o-transition: 0.5s linear ; transition: 0.5s linear;  }
 #bar.final {    animation-duration: 500ms; animation-name: blink; animation-iteration-count: infinite; animation-direction: alternate;}
+#bar.mm { background-image: url(/images/mm.gif); background-size: cover; background-position-y: 30%; opacity: 0.7;}
 #help { margin: 40px 30px;}
 .logo {height: 4vh;}
 input { width: 94%; font-size: 2rem;}
