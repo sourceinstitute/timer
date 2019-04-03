@@ -80,7 +80,6 @@ export default {
       internalTimerMarker: 0,
       nextBell: new Array(),
       requestedTime: decodeURI(window.location.pathname.slice(1)),
-      currentRequest: null,
       isFinal: false,
       isMMmode: false,
     }
@@ -118,10 +117,10 @@ export default {
       return ret;
     },
     percentage: function () {
-      return (Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2);
+      return Math.min(100,(Number(this.timerLength-this.timeLeft)/ Number(this.timerLength)*100).toFixed(2));
     },
     currentPercentage: function () {
-      return (Number(this.timerLength-this.timeLeft-this.prevTimers)/ this.currentTimerLength*100).toFixed(2);
+      return Math.min(100,(Number(this.timerLength-this.timeLeft-this.prevTimers)/ this.currentTimerLength*100).toFixed(2));
     },
     prevTimers: function () {
       var prevTimers = 0;
@@ -297,6 +296,7 @@ export default {
     startTicker () {
       this.running = true;
       this.startTS = Date.now() - this.timeElapsedSaved*1000 ;
+      this.timeElapsedSaved = 0;
       this.$matomo.trackEvent('timer', 'unpause');
     },
     pressSpace() {
@@ -317,7 +317,11 @@ export default {
       this.fullscreen = fullscreen
     },
     restart () {
+      console.log('restart');
       this.startTS = Date.now() ;
+      this.timeElapsed = 0;
+      this.timeElapsedSaved = 0;
+      this.timeLeft = this.timerLength;
       this.setupBellPoints();
       this.running = true;
       this.$matomo.trackEvent('timer', 'restart');
@@ -399,4 +403,3 @@ form {margin: .5rem; text-align: center;}
 }
 @keyframes blink { from { opacity: 1; } to { opacity: 0.3; } }
 </style>
-
