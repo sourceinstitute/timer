@@ -10,9 +10,8 @@
       <div id="timer" v-on:click="pressSpace">
         <span class="timeleft" v-resize-text="{ratio:1}" v-bind:class="{label: currentLabel}" >{{currentTimeLeft | timer(currentLabel)}}</span>
       </div>
-      <a id="fullscreen" v-shortkey="['f']" @shortkey="toggleFS()" @click="toggleFS"><img src="/images/fullscreen.png" /></a>
+      <a id="bottomcontrols" v-shortkey.once="['h']" @shortkey="showHelp()" @click="showHelp"><img src="/images/help.png" /></a>
       <div id="controls">
-        <a v-shortkey.once="['h']" @shortkey="showHelp()" @click="showHelp"><img src="/images/help.png" /></a>
         <a v-shortkey.once="['s']" @shortkey="setTime()" @click="setTime"><img src="/images/alarm.png" /></a>
         <i v-shortkey.once="['space']" @shortkey="toggleTicker()"></i>
         <i v-shortkey.once="['1']" @shortkey="moreTime(60)"></i>
@@ -30,6 +29,7 @@
         <i v-shortkey.once="['esc']" @shortkey="setTime()"></i>
         <i v-shortkey.once="['t']" @shortkey="moreTime(10)"></i>
         <i v-shortkey.once="['m']" @shortkey="setMode('mm')"></i>
+        <i v-shortkey.once="['f']" @shortkey="toggleFS()"></i>
       </div>
       <div id="footer">
         <strong>Press H</strong> for help. Made for facilitators by <a href="http://source.institute"><img src="/images/logo.png" class="logo"></a>
@@ -376,7 +376,7 @@ export default {
 </script>
 
 <style>
-#fullscreen { position: fixed; right: 10px; bottom: 10px; z-index: 20}
+#bottomcontrols { position: fixed; right: 10px; bottom: 10px; z-index: 20}
 #controls { position: fixed; right: 10px; top: 6%; z-index: 20}
 #controls img { filter: greyscale(50%) hue-rotate(90deg); }
 .bellline { position: absolute; top: 0; height: 4%; float: left; border-right: 0.5rem solid #999; z-index: 20;}
@@ -399,7 +399,7 @@ form {margin: .5rem; text-align: center;}
   #timer{font-size: 80vh; }
 }
 @media all and (max-height: 500px) {
-  #fullscreen img, #controls img { width: 2rem; min-width: 30px; min-height: 30px; height: 2rem; padding: 4px; }
+  #bottomcontrols img, #controls img { width: 2rem; min-width: 30px; min-height: 30px; height: 2rem; padding: 4px; }
 }
 @keyframes blink { from { opacity: 1; } to { opacity: 0.3; } }
 </style>
