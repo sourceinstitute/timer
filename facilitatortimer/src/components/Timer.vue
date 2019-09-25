@@ -65,10 +65,10 @@ export default {
   data() {
     return {
       startTS: Date.now(),
-      timerLength: 60,
-      timeLeft: 60,
+      timerLength: 0,
+      timeLeft: 0,
       timeElapsed: 0,
-      currentTimeLeft: 60,
+      currentTimeLeft: 0,
       currentLabel: "",
       timeElapsedSaved: 0,
       running: false,
